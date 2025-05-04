@@ -1,5 +1,5 @@
 
-import { Route, Switch, Link } from "wouter";
+import { Link, Route, Switch } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,27 +23,25 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Route path="/admin/login" component={AdminLogin} />
-        <Route path="/admin/posts" component={AdminPosts} />
-        <Route path="/:rest*">
-          {(params) => (
-            <>
-              <Header />
-              <Switch>
-                <Route path="/" component={Home} />
-                <Route path="/blog" component={Blog} />
-                <Route path="/blog/:slug" component={Post} />
-                <Route path="/about" component={About} />
-                <Route path="/contact" component={Contact} />
-                <Route path="/services" component={Services} />
-                <Route component={NotFound} />
-              </Switch>
-              <Footer />
-              <ScrollToTop />
-              <Toaster />
-            </>
-          )}
-        </Route>
+        <Switch>
+          <Route path="/admin/login" component={AdminLogin} />
+          <Route path="/admin/posts" component={AdminPosts} />
+          <Route>
+            <Header />
+            <Switch>
+              <Route path="/" component={Home} />
+              <Route path="/blog" component={Blog} />
+              <Route path="/blog/:slug" component={Post} />
+              <Route path="/about" component={About} />
+              <Route path="/contact" component={Contact} />
+              <Route path="/services" component={Services} />
+              <Route component={NotFound} />
+            </Switch>
+            <Footer />
+            <ScrollToTop />
+            <Toaster />
+          </Route>
+        </Switch>
       </TooltipProvider>
     </QueryClientProvider>
   );
