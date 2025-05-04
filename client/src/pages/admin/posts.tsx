@@ -175,20 +175,22 @@ export default function AdminPosts() {
                   if (file) {
                     try {
                       const formData = new FormData();
-                      formData.append('image', file);
+                formData.append('thumbnailImage', file);
 
-                      const res = await fetch('/api/upload', {
-                        method: 'POST',
-                        headers: {
-                          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-                        },
-                        body: formData
-                      });
+                const res = await fetch('/api/upload/thumbnail', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                  },
+                  body: formData
+                });
 
-                      if (!res.ok) throw new Error('Failed to upload thumbnail');
+                if (!res.ok) throw new Error('Failed to upload thumbnail');
 
-                      const { url } = await res.json();
-                      setThumbnail(url);
+                const response = await res.text();
+                const filename = response.replace('File uploaded successfully: ', '');
+                const url = `/uploads/${filename}`;
+                setThumbnail(url);
                     } catch (err) {
                       setError('Failed to upload thumbnail. Please try again.');
                     }
