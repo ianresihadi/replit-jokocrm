@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -22,6 +21,7 @@ export default function AdminPosts() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [thumbnail, setThumbnail] = useState(''); // Added thumbnail state
   const [, setLocation] = useLocation();
 
   const editor = useEditor({
@@ -51,7 +51,7 @@ export default function AdminPosts() {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      
+
       const res = await fetch('/api/upload', {
         method: 'POST',
         headers: {
@@ -59,9 +59,9 @@ export default function AdminPosts() {
         },
         body: formData
       });
-      
+
       if (!res.ok) throw new Error('Failed to upload image');
-      
+
       const { url } = await res.json();
       editor?.chain().focus().setImage({ src: url }).run();
     } catch (err) {
@@ -78,7 +78,7 @@ export default function AdminPosts() {
       const token = localStorage.getItem('adminToken');
       const content = editor?.getHTML() || '';
 
-      if (!title || !content || !category) {
+      if (!title || !content || !category || !thumbnail) { // Added thumbnail check
         throw new Error('Please fill all required fields');
       }
 
@@ -100,6 +100,7 @@ export default function AdminPosts() {
           tags: [],
           slug,
           excerpt,
+          thumbnail // Added thumbnail to the request body
         }),
       });
 
@@ -111,6 +112,7 @@ export default function AdminPosts() {
       setTitle('');
       setCategory('');
       editor?.commands.setContent('');
+      setThumbnail(''); // Clear thumbnail after successful submission
       alert('Post berhasil dibuat!');
       setLocation('/blog');
     } catch (err: any) {
@@ -161,6 +163,46 @@ export default function AdminPosts() {
               </Select>
             </div>
 
+            <div className="mb-6">
+              <label className="block text-sm font-medium mb-2">
+                Thumbnail Image
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    try {
+                      const formData = new FormData();
+                      formData.append('image', file);
+
+                      const res = await fetch('/api/upload', {
+                        method: 'POST',
+                        headers: {
+                          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                        },
+                        body: formData
+                      });
+
+                      if (!res.ok) throw new Error('Failed to upload thumbnail');
+
+                      const { url } = await res.json();
+                      setThumbnail(url);
+                    } catch (err) {
+                      setError('Failed to upload thumbnail. Please try again.');
+                    }
+                  }
+                }}
+                className="block w-full text-sm text-slate-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-md file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-primary file:text-white
+                  hover:file:bg-primary/90"
+              />
+            </div>
+
             <div className="border dark:border-slate-600 rounded-lg p-4">
               <div className="mb-2">
                 <input
@@ -171,14 +213,14 @@ export default function AdminPosts() {
                     if (file) handleImageUpload(file);
                   }}
                   className="hidden"
-                  id="image-upload"
+                  id="content-image-upload"
                 />
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => document.getElementById('image-upload')?.click()}
+                  onClick={() => document.getElementById('content-image-upload')?.click()}
                 >
-                  Upload Image
+                  Insert Content Image
                 </Button>
               </div>
               <EditorContent editor={editor} />
