@@ -123,8 +123,11 @@ export default function AdminPosts() {
       const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
       const excerpt = content.replace(/<[^>]*>/g, '').substring(0, 160) + '...';
 
-      const res = await fetch('/api/posts', {
-        method: 'POST',
+      const endpoint = editingPost ? `/api/admin/posts/${editingPost.id}` : '/api/posts';
+      const method = editingPost ? 'PUT' : 'POST';
+
+      const res = await fetch(endpoint, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
