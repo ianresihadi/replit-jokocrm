@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -41,7 +40,7 @@ export default function AdminPosts() {
       .then(res => res.json())
       .then(data => setCategories(data))
       .catch(err => setError('Failed to load categories'));
-  }, [navigate]);
+  }, [setLocation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +73,7 @@ export default function AdminPosts() {
       setTitle('');
       setCategory('');
       editor?.commands.setContent('');
-      
+
       // Show success message
       alert('Post berhasil dibuat!');
     } catch (err) {
@@ -91,13 +90,13 @@ export default function AdminPosts() {
           <h1 className="text-2xl font-bold mb-8 text-slate-900 dark:text-white">
             Buat Post Baru
           </h1>
-          
+
           {error && (
             <Alert variant="destructive" className="mb-4">
               {error}
             </Alert>
           )}
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <Input
@@ -109,7 +108,7 @@ export default function AdminPosts() {
                 className="text-lg"
               />
             </div>
-            
+
             <div>
               <Select
                 value={category}
@@ -124,11 +123,11 @@ export default function AdminPosts() {
                 ))}
               </Select>
             </div>
-            
+
             <div className="border dark:border-slate-600 rounded-lg p-4">
               <EditorContent editor={editor} />
             </div>
-            
+
             <div className="flex justify-end gap-4">
               <Button
                 type="button"
