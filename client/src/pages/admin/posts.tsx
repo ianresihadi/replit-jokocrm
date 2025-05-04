@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
@@ -16,7 +16,7 @@ export default function AdminPosts() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
 
   const editor = useEditor({
     extensions: [StarterKit, Image],
@@ -32,7 +32,7 @@ export default function AdminPosts() {
     // Check authentication
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      navigate('/admin/login');
+      setLocation('/admin/login');
       return;
     }
 
@@ -133,7 +133,7 @@ export default function AdminPosts() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate('/blog')}
+                onClick={() => setLocation('/blog')}
               >
                 Batal
               </Button>
