@@ -1,5 +1,5 @@
+
 import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
@@ -69,8 +69,8 @@ export default function AdminPosts() {
           content,
           categoryId: parseInt(category),
           published: true,
-          authorId: 1, // Default author
-          tags: [], // Empty tags array
+          authorId: 1,
+          tags: [],
         }),
       });
 
@@ -85,7 +85,7 @@ export default function AdminPosts() {
 
       // Show success message and redirect
       alert('Post berhasil dibuat!');
-      window.location.href = '/blog';
+      setLocation('/blog');
     } catch (err) {
       setError('Gagal membuat post. Silakan coba lagi.');
     } finally {
