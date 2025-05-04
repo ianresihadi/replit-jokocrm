@@ -1,10 +1,26 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import path from "path";
+import multer from 'multer';
+
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/') // This needs to be a valid directory
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname))
+  }
+})
+
+const upload = multer({ storage: storage })
+
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -35,6 +51,21 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.post('/api/upload/content', upload.single('contentImage'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  res.send(`File uploaded successfully: ${req.file.filename}`);
+});
+
+app.post('/api/upload/thumbnail', upload.single('thumbnailImage'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  res.send(`File uploaded successfully: ${req.file.filename}`);
+});
+
 
 (async () => {
   const server = await registerRoutes(app);

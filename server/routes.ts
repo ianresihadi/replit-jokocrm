@@ -2,8 +2,32 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
+import multer from "multer";
+import path from "path";
 import { insertSubscriberSchema, insertContactMessageSchema, insertPostSchema } from "@shared/schema";
 import { authenticate, ADMIN_USERNAME, ADMIN_PASSWORD, JWT_SECRET } from "./auth";
+
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: './uploads',
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  }),
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type'));
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API endpoints prefixed with /api
@@ -238,6 +262,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
   // Admin login
+  // File upload endpoint
+  app.post("/api/upload", authenticate, upload.single('image'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      const imageUrl = `/uploads/${req.file.filename}`;
+      res.json({ url: imageUrl });
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      res.status(500).json({ message: "Failed to upload file" });
+    }
+  });
+
   app.post("/api/admin/login", (req, res) => {
     const { username, password } = req.body;
 
