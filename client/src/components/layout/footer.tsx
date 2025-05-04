@@ -24,7 +24,7 @@ const Footer = () => {
               </a>
             </div>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-medium text-white mb-4">Menu Utama</h3>
             <ul className="space-y-2">
@@ -35,7 +35,7 @@ const Footer = () => {
               <li><Link href="/privacy" className="hover:text-white transition-colors duration-150">Privacy Policy</Link></li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-medium text-white mb-4">Kategori</h3>
             <ul className="space-y-2">
@@ -46,8 +46,22 @@ const Footer = () => {
               <li><Link href="/blog?category=Technology" className="hover:text-white transition-colors duration-150">Technology</Link></li>
             </ul>
           </div>
+          <div className="space-y-4">
+            <h3 className="font-medium text-white mb-4">Links</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/about" className="hover:text-white transition-colors duration-150">Tentang</Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-white transition-colors duration-150">Kontak</Link>
+              </li>
+              <li>
+                <Link to="/admin/login" className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300">Admin</Link>
+              </li>
+            </ul>
+          </div>
         </div>
-        
+
         <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col md:flex-row md:justify-between">
           <p>© {new Date().getFullYear()} Jokoris. All rights reserved.</p>
           <div className="mt-4 md:mt-0">
