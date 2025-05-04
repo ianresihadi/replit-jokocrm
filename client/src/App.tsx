@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import { Route, Switch, Link } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,32 +19,31 @@ import NotFound from "@/pages/not-found";
 import AdminLogin from "@/pages/admin/login";
 import AdminPosts from "@/pages/admin/posts";
 
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Router>
-          <Routes>
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/posts" element={<AdminPosts />} />
-            <Route path="/" element={<div>
+        <Route path="/admin/login" component={AdminLogin} />
+        <Route path="/admin/posts" component={AdminPosts} />
+        <Route path="/:rest*">
+          {(params) => (
+            <>
               <Header />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<Post />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Switch>
+                <Route path="/" component={Home} />
+                <Route path="/blog" component={Blog} />
+                <Route path="/blog/:slug" component={Post} />
+                <Route path="/about" component={About} />
+                <Route path="/contact" component={Contact} />
+                <Route path="/services" component={Services} />
+                <Route component={NotFound} />
+              </Switch>
               <Footer />
               <ScrollToTop />
-              <Toaster/>
-            </div>} />
-          </Routes>
-        </Router>
+              <Toaster />
+            </>
+          )}
+        </Route>
       </TooltipProvider>
     </QueryClientProvider>
   );
