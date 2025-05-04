@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .bg-gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500 dark:from-blue-400 dark:to-primary;
+  }
+}
+
+:root {
+  --background: 210 40% 98%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 178 75% 29%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 178 75% 29%;
+  --radius: 0.5rem;
+
+  /* Category Colors */
+  --life-bg: 142 76% 94%;
+  --life-text: 142 76% 36%;
+  --religion-bg: 248 96% 94%;
+  --religion-text: 248 96% 50%;
+  --marketing-bg: 38 92% 90%;
+  --marketing-text: 38 92% 45%;
+  --technology-bg: 270 76% 94%;
+  --technology-text: 270 76% 50%;
+  --books-bg: 350 100% 94%;
+  --books-text: 350 100% 50%;
+  --career-bg: 214 100% 94%;
+  --career-text: 214 100% 50%;
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 9.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 9.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 178 75% 29%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 178 75% 40%;
+
+  /* Category Colors - Dark Mode */
+  --life-bg: 142 76% 20%;
+  --life-text: 142 76% 70%;
+  --religion-bg: 248 96% 20%;
+  --religion-text: 248 96% 80%;
+  --marketing-bg: 38 92% 20%;
+  --marketing-text: 38 92% 80%;
+  --technology-bg: 270 76% 20%;
+  --technology-text: 270 76% 80%;
+  --books-bg: 350 100% 20%;
+  --books-text: 350 100% 80%;
+  --career-bg: 214 100% 20%;
+  --career-text: 214 100% 80%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  .font-poppins {
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
+@layer components {
+  .reading-container {
+    max-width: 72ch;
+    margin: 0 auto;
+  }
+  
+  .card-hover-effect {
+    @apply transition-transform duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg;
+  }
+  
+  .bg-gradient-text {
+    @apply bg-gradient-to-r from-primary to-primary/80 text-transparent bg-clip-text;
+  }
+
+  /* Category Classes */
+  .category-life {
+    @apply bg-[hsl(var(--life-bg))] text-[hsl(var(--life-text))];
+  }
+  
+  .category-religion {
+    @apply bg-[hsl(var(--religion-bg))] text-[hsl(var(--religion-text))];
+  }
+  
+  .category-marketing {
+    @apply bg-[hsl(var(--marketing-bg))] text-[hsl(var(--marketing-text))];
+  }
+  
+  .category-technology {
+    @apply bg-[hsl(var(--technology-bg))] text-[hsl(var(--technology-text))];
+  }
+  
+  .category-books {
+    @apply bg-[hsl(var(--books-bg))] text-[hsl(var(--books-text))];
+  }
+  
+  .category-career {
+    @apply bg-[hsl(var(--career-bg))] text-[hsl(var(--career-text))];
+  }
+}

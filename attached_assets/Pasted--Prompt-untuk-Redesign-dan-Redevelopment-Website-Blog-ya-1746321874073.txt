@@ -1,0 +1,75 @@
+________________________________________
+🔧 Prompt untuk Redesign dan Redevelopment Website Blog yang Scalable & Relevan dengan Gen Z
+Buatkan sebuah website blog modern yang engaging dan relevan untuk Gen Z dengan pengalaman pengguna yang ramah mobile, responsif, cepat diakses, dan memiliki desain visual yang fresh dan profesional. Website ini akan menggantikan versi lama dari https://www.jokoris.com. Gunakan seluruh hasil asesmen di atas sebagai dasar desain dan pengembangan ulang.
+🎯 Tujuan Website
+•	Meningkatkan engagement pengguna (terutama Gen Z) dengan UI/UX yang menarik
+•	Meningkatkan traffic organik melalui optimasi SEO teknikal dan konten
+•	Menjadi blog pribadi/profesional yang scalable, aman, dan mudah dikembangkan
+________________________________________
+📦 Fitur Wajib Website Blog Baru
+1.	Beranda (Homepage) Dinamis
+o	Hero section dengan quote/inspirasi
+o	Highlight artikel terbaru dan trending
+2.	Halaman Blog & Kategori
+o	Tampilan artikel berdasarkan kategori: Kehidupan, Religi, Marketing, dll.
+o	Infinite scroll atau pagination modern
+3.	Halaman Detail Artikel
+o	Gambar utama (thumbnail), tag/kategori, share ke sosial media
+o	Komentar (gunakan Disqus atau solusi scalable lainnya)
+o	Estimasi waktu baca + tombol "kembali ke atas"
+4.	Search Bar Otomatis
+o	Fuzzy search dan keyword suggestion
+5.	Sitemap XML & Robots.txt Generator
+6.	SEO Optimization Built-in
+o	Auto meta-title, description, alt image tagging
+7.	CMS Admin Panel (Optional / Future-ready)
+o	Untuk input konten via GUI, bukan langsung ke DB
+8.	Analytics
+o	Integrasi Google Analytics dan Facebook Pixel
+9.	Mode Gelap (Dark Mode) Toggle
+10.	Newsletter Subscription & Pop-up CTA
+11.	Contact Page / Feedback Form
+12.	About Page & Author Section
+13.	RSS Feed
+________________________________________
+🛠️ Tech Stack yang Direkomendasikan (Fullstack Scalable & Future-Proof)
+⚙️ Frontend
+•	React.js (Next.js) – untuk SSR & kecepatan SEO
+•	Tailwind CSS – untuk UI yang ringan dan modern
+•	Framer Motion – animasi interaktif
+•	React Hook Form – form handling
+•	Headless UI / shadcn/ui – komponen aksesibel dan elegan
+•	React Helmet / next-seo – SEO friendly meta tagging
+🗄️ Backend
+•	Node.js + Express atau Next.js API Routes
+•	PostgreSQL (opsional: Supabase sebagai SaaS alternatif open-source Firebase)
+•	Prisma ORM – untuk akses database modern dan clean
+🧱 Content Management & Storage
+•	MDX / Markdown Parsing – untuk artikel
+•	Cloudinary / ImageKit – untuk manajemen gambar
+•	S3-compatible Storage (MinIO / Wasabi / Supabase Storage) – untuk aset blog lama
+•	Redis (opsional) – untuk cache konten populer
+🔐 Deployment & DevOps
+•	Vercel atau Netlify untuk frontend
+•	Railway / Render / Supabase untuk backend & DB
+•	Cloudflare – keamanan, CDN, dan performance
+•	HTTPS enforced + SSL
+•	GitHub CI/CD integration untuk auto-deploy
+📈 Analytics & Monitoring
+•	Google Analytics v4
+•	Umami (jika ingin self-hosted analytics)
+•	Sentry – untuk error tracking
+________________________________________
+📁 Migrasi Data
+•	Export seluruh konten blog lama dalam format .xml atau .json dari Blogger
+•	Konversi artikel menjadi format Markdown untuk diimport ke blog baru
+•	Upload aset gambar lama ke Cloud Storage (Cloudinary, Supabase, S3)
+•	Buat script migrasi untuk memasukkan artikel ke sistem backend atau file MDX statis
+________________________________________
+🧠 UX/UI Guidelines (Untuk Gen Z)
+•	Warna soft namun kontras (mode gelap & terang)
+•	Font modern dan readable (misalnya Inter, Satoshi, atau Poppins)
+•	Elemen micro-interaction (hover, transition, feedback saat klik)
+•	Navigasi simple, minimalis
+•	Emphasis pada personal voice dan aesthetic layout
+________________________________________
