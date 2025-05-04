@@ -2,7 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
-import { insertSubscriberSchema, insertContactMessageSchema } from "@shared/schema";
+import { insertSubscriberSchema, insertContactMessageSchema, insertPostSchema } from "@shared/schema";
+import { authenticate, ADMIN_USERNAME, ADMIN_PASSWORD, JWT_SECRET } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API endpoints prefixed with /api
@@ -235,6 +236,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create HTTP server
   const httpServer = createServer(app);
+
+  // Admin login
+  app.post("/api/admin/login", (req, res) => {
+    const { username, password } = req.body;
+    
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      res.json({ token: JWT_SECRET });
+    } else {
+      res.status(401).json({ message: "Invalid credentials" });
+    }
+  });
+
+  // Create post (protected)
+  app.post("/api/posts", authenticate, async (req, res) => {
+    try {
+      const result = insertPostSchema.safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid post data", 
+          errors: result.error.errors 
+        });
+      }
+      
+      // Add default values
+      const postData = {
+        ...result.data,
+        slug: result.data.title.toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, ""),
+        excerpt: result.data.content
+          .replace(/<[^>]*>/g, "")
+          .substring(0, 160) + "...",
+        published: true,
+        authorId: 1, // Default author
+      };
+      
+      const post = await storage.createPost(postData);
+      res.status(201).json(post);
+    } catch (error) {
+      console.error("Error creating post:", error);
+      res.status(500).json({ message: "Failed to create post" });
+    }
+  });
 
   return httpServer;
 }
