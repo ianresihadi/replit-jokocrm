@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useLocation } from 'wouter';
 import { Alert } from '@/components/ui/alert';
 import type { Category } from '@shared/schema';
 
@@ -82,8 +83,9 @@ export default function AdminPosts() {
       setCategory('');
       editor?.commands.setContent('');
 
-      // Show success message
+      // Show success message and redirect
       alert('Post berhasil dibuat!');
+      window.location.href = '/blog';
     } catch (err) {
       setError('Gagal membuat post. Silakan coba lagi.');
     } finally {
