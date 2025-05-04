@@ -105,6 +105,20 @@ export default function AdminPosts() {
     setCategory(post.categoryId.toString());
     setThumbnail(post.thumbnail || '');
     editor?.commands.setContent(post.content);
+    // Auto switch to editor tab when editing
+    const editorTab = document.querySelector('[value="editor"]') as HTMLElement;
+    editorTab?.click();
+  };
+
+  const handleNewPost = () => {
+    setEditingPost(null);
+    setTitle('');
+    setCategory('');
+    setThumbnail('');
+    editor?.commands.setContent('');
+    // Switch to editor tab
+    const editorTab = document.querySelector('[value="editor"]') as HTMLElement;
+    editorTab?.click();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -178,6 +192,9 @@ export default function AdminPosts() {
                 {editingPost ? 'Edit Post' : 'Buat Post Baru'}
               </TabsTrigger>
             </TabsList>
+            <Button onClick={handleNewPost} className="bg-primary">
+              <Plus className="h-4 w-4 mr-2" /> Tambah Post Baru
+            </Button>
           </div>
 
           <TabsContent value="posts">
