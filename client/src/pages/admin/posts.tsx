@@ -68,6 +68,8 @@ export default function AdminPosts() {
           content,
           categoryId: parseInt(category),
           published: true,
+          authorId: 1, // Default author
+          tags: [], // Empty tags array
         }),
       });
 
