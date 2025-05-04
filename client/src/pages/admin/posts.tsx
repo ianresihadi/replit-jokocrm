@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
@@ -12,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useLocation } from 'wouter';
 import { Alert } from '@/components/ui/alert';
 import type { Category } from '@shared/schema';
 
@@ -35,18 +35,16 @@ export default function AdminPosts() {
   });
 
   useEffect(() => {
-    // Check authentication
     const token = localStorage.getItem('adminToken');
     if (!token) {
       setLocation('/admin/login');
       return;
     }
 
-    // Fetch categories
     fetch('/api/categories')
       .then(res => res.json())
       .then(data => setCategories(data))
-      .catch(err => setError('Failed to load categories'));
+      .catch(() => setError('Failed to load categories'));
   }, [setLocation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,6 +55,13 @@ export default function AdminPosts() {
     try {
       const token = localStorage.getItem('adminToken');
       const content = editor?.getHTML() || '';
+
+      if (!title || !content || !category) {
+        throw new Error('Please fill all required fields');
+      }
+
+      const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const excerpt = content.replace(/<[^>]*>/g, '').substring(0, 160) + '...';
 
       const res = await fetch('/api/posts', {
         method: 'POST',
@@ -71,23 +76,23 @@ export default function AdminPosts() {
           published: true,
           authorId: 1,
           tags: [],
+          slug,
+          excerpt,
         }),
       });
 
       if (!res.ok) {
-        throw new Error('Failed to create post');
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to create post');
       }
 
-      // Reset form
       setTitle('');
       setCategory('');
       editor?.commands.setContent('');
-
-      // Show success message and redirect
       alert('Post berhasil dibuat!');
       setLocation('/blog');
-    } catch (err) {
-      setError('Gagal membuat post. Silakan coba lagi.');
+    } catch (err: any) {
+      setError(err.message || 'Gagal membuat post. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }
@@ -120,7 +125,7 @@ export default function AdminPosts() {
             </div>
 
             <div>
-              <Select value={category} onValueChange={setCategory} required>
+              <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih Kategori" />
                 </SelectTrigger>
