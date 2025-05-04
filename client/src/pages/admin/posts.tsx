@@ -47,6 +47,28 @@ export default function AdminPosts() {
       .catch(() => setError('Failed to load categories'));
   }, [setLocation]);
 
+  const handleImageUpload = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+        body: formData
+      });
+      
+      if (!res.ok) throw new Error('Failed to upload image');
+      
+      const { url } = await res.json();
+      editor?.chain().focus().setImage({ src: url }).run();
+    } catch (err) {
+      setError('Failed to upload image. Please try again.');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -140,6 +162,25 @@ export default function AdminPosts() {
             </div>
 
             <div className="border dark:border-slate-600 rounded-lg p-4">
+              <div className="mb-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpload(file);
+                  }}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('image-upload')?.click()}
+                >
+                  Upload Image
+                </Button>
+              </div>
               <EditorContent editor={editor} />
             </div>
 
