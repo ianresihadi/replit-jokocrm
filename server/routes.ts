@@ -330,6 +330,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/admin/posts/:id", authenticate, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const result = insertPostSchema.safeParse(req.body);
+
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid post data", 
+          errors: result.error.errors 
+        });
+      }
+
+      const postData = {
+        ...result.data,
+        slug: result.data.title.toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, ""),
+        excerpt: result.data.content
+          .replace(/<[^>]*>/g, "")
+          .substring(0, 160) + "..."
+      };
+
+      const updatedPost = await storage.updatePost(parseInt(id), postData);
+      res.json(updatedPost);
+    } catch (error) {
+      console.error("Error updating post:", error);
+      res.status(500).json({ message: "Failed to update post" });
+    }
+  });
+
   app.delete("/api/admin/posts/:id", authenticate, async (req, res) => {
     try {
       const { id } = req.params;
