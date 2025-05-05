@@ -38,6 +38,8 @@ export default function AdminPosts() {
   const [searchQuery, setSearchQuery] = useState('');
   const [view, setView] = useState<'list' | 'grid'>('list');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [, setLocation] = useLocation();
 
   const editor = useEditor({
@@ -470,56 +472,76 @@ export default function AdminPosts() {
           </TabsContent>
           <TabsContent value="batch">
             <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
-              <input
-                type="file"
-                multiple
-                accept=".mdx"
-                onChange={async (e) => {
-                  const files = Array.from(e.target.files || []);
-                  const fileContents = await Promise.all(
-                    files.map(async (file) => ({
-                      filename: file.name,
-                      content: await file.text()
-                    }))
-                  );
+              <div className="space-y-4">
+                <input
+                  type="file"
+                  multiple
+                  accept=".mdx"
+                  onChange={(e) => {
+                    setSelectedFiles(Array.from(e.target.files || []));
+                  }}
+                  className="block w-full text-sm text-slate-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-md file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-primary file:text-white
+                    hover:file:bg-primary/90"
+                />
+                {selectedFiles.length > 0 && (
+                  <div>
+                    <p className="text-sm text-slate-500 mb-2">
+                      {selectedFiles.length} file(s) selected
+                    </p>
+                    <Button 
+                      onClick={async () => {
+                        setUploading(true);
+                        try {
+                          const fileContents = await Promise.all(
+                            selectedFiles.map(async (file) => ({
+                              filename: file.name,
+                              content: await file.text()
+                            }))
+                          );
 
-                  try {
-                    if (!localStorage.getItem('adminToken')) {
-                      throw new Error('Not authenticated');
-                    }
+                          if (!localStorage.getItem('adminToken')) {
+                            throw new Error('Not authenticated');
+                          }
 
-                    const res = await fetch('/api/upload/mdx', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                      },
-                      body: JSON.stringify({ files: fileContents })
-                    });
+                          const res = await fetch('/api/upload/mdx', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                            },
+                            body: JSON.stringify({ files: fileContents })
+                          });
 
-                    if (!res.ok) {
-                      const error = await res.json();
-                      throw new Error(error.message || 'Upload failed');
-                    }
+                          if (!res.ok) {
+                            const error = await res.json();
+                            throw new Error(error.message || 'Upload failed');
+                          }
 
-                    const newPosts = await res.json();
-                    setPosts(prev => [...prev, ...newPosts]);
-                    alert(`Successfully uploaded ${files.length} posts`);
-                  } catch (err: any) {
-                    console.error('Upload error:', err);
-                    setError(err.message || 'Failed to upload MDX files. Please try again.');
-                  }
-                }}
-                className="block w-full text-sm text-slate-500
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-md file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-primary file:text-white
-                  hover:file:bg-primary/90"
-              />
-              <p className="mt-2 text-sm text-slate-500">
-                Select multiple .mdx files to upload. Each file should have proper frontmatter with title, slug, excerpt, etc.
-              </p>
+                          const newPosts = await res.json();
+                          setPosts(prev => [...prev, ...newPosts]);
+                          setSelectedFiles([]);
+                          alert(`Successfully uploaded ${fileContents.length} posts`);
+                        } catch (err: any) {
+                          console.error('Upload error:', err);
+                          setError(err.message || 'Failed to upload MDX files. Please try again.');
+                        } finally {
+                          setUploading(false);
+                        }
+                      }}
+                      disabled={uploading}
+                    >
+                      {uploading ? 'Uploading...' : 'Upload Files'}
+                    </Button>
+                  </div>
+                )}
+                <p className="text-sm text-slate-500">
+                  Select multiple .mdx files to upload. Each file should have proper frontmatter with title, slug, excerpt, etc.
+                </p>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
