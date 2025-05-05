@@ -5,6 +5,7 @@ import { z } from "zod";
 import multer from "multer";
 import path from "path";
 import matter from "gray-matter";
+import fs from 'fs/promises';
 import { insertSubscriberSchema, insertContactMessageSchema, insertPostSchema } from "@shared/schema";
 import { authenticate, ADMIN_USERNAME, ADMIN_PASSWORD, JWT_SECRET } from "./auth";
 
@@ -31,6 +32,10 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Create content directory if it doesn't exist
+  const contentDir = path.join(process.cwd(), 'client/src/content/posts');
+  await fs.mkdir(contentDir, { recursive: true });
+
   // API endpoints prefixed with /api
 
   // Categories
@@ -285,37 +290,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid files data" });
       }
 
-      // Get existing posts first
-      const { posts: existingPosts } = await storage.getPosts();
-      
       const results = [];
       for (const file of files) {
         const { content, filename } = file;
         const { data: frontmatter, content: mdxContent } = matter(content);
-        
+
         // Generate slug from filename if not provided
         const slug = frontmatter.slug || filename.replace('.mdx', '').toLowerCase();
-        
-        // Check if post with same slug already exists
-        const existingPost = existingPosts.find(p => p.slug === slug);
-        
-        // Create post from MDX
-        const postData = {
-          title: frontmatter.title || filename.replace('.mdx', ''),
-          content: mdxContent,
-          slug: slug,
-          excerpt: frontmatter.excerpt || mdxContent.slice(0, 160) + '...',
-          categoryId: frontmatter.categoryId || 1,
-          published: true,
-          authorId: 1,
-          thumbnail: frontmatter.thumbnail || '',
-          tags: frontmatter.tags || []
-        };
 
         try {
+          // Save MDX file
+          const mdxFilePath = path.join(contentDir, `${slug}.mdx`);
+          await fs.writeFile(mdxFilePath, content);
+
+          // Create post from MDX
+          const postData = {
+            title: frontmatter.title || filename.replace('.mdx', ''),
+            content: mdxContent,
+            slug: slug,
+            excerpt: frontmatter.excerpt || mdxContent.slice(0, 160) + '...',
+            categoryId: frontmatter.categoryId || 1,
+            published: true,
+            authorId: 1,
+            thumbnail: frontmatter.thumbnail || '',
+            tags: frontmatter.tags || []
+          };
+
+          // Get existing posts first
+          const { posts: existingPosts } = await storage.getPosts();
+          const existingPost = existingPosts.find(p => p.slug === slug);
+
           let post;
           if (existingPost) {
-            // Update existing post while preserving its ID and other fields
             post = await storage.updatePost(existingPost.id, {
               ...existingPost,
               ...postData,
@@ -324,13 +330,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
             console.log(`Updated existing post: ${post.title}`);
           } else {
-            // Create new post
             post = await storage.createPost(postData);
             console.log(`Created new post: ${post.title}`);
           }
           results.push(post);
         } catch (error) {
           console.error(`Error processing file ${filename}:`, error);
+          throw error;
         }
       }
 
