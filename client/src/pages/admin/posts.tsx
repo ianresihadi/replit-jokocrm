@@ -469,8 +469,50 @@ export default function AdminPosts() {
             </div>
           </TabsContent>
           <TabsContent value="batch">
-            {/*  Add MDX batch upload functionality here */}
-            <p>MDX batch upload functionality not yet implemented.</p>
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
+              <input
+                type="file"
+                multiple
+                accept=".mdx"
+                onChange={async (e) => {
+                  const files = Array.from(e.target.files || []);
+                  const fileContents = await Promise.all(
+                    files.map(async (file) => ({
+                      filename: file.name,
+                      content: await file.text()
+                    }))
+                  );
+
+                  try {
+                    const res = await fetch('/api/upload/mdx', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                      },
+                      body: JSON.stringify({ files: fileContents })
+                    });
+
+                    if (!res.ok) throw new Error('Upload failed');
+
+                    const newPosts = await res.json();
+                    setPosts([...posts, ...newPosts]);
+                    alert(`Successfully uploaded ${files.length} posts`);
+                  } catch (err) {
+                    setError('Failed to upload MDX files. Please try again.');
+                  }
+                }}
+                className="block w-full text-sm text-slate-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-md file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-primary file:text-white
+                  hover:file:bg-primary/90"
+              />
+              <p className="mt-2 text-sm text-slate-500">
+                Select multiple .mdx files to upload. Each file should have proper frontmatter with title, slug, excerpt, etc.
+              </p>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

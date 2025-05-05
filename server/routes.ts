@@ -262,7 +262,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
   // Admin login
-  // File upload endpoint
+  // File upload endpoints
   app.post("/api/upload", authenticate, upload.single('image'), (req, res) => {
     try {
       if (!req.file) {
@@ -273,6 +273,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error uploading file:", error);
       res.status(500).json({ message: "Failed to upload file" });
+    }
+  });
+
+  // MDX batch upload endpoint
+  app.post("/api/upload/mdx", authenticate, async (req, res) => {
+    try {
+      const files = req.body.files;
+      if (!Array.isArray(files)) {
+        return res.status(400).json({ message: "Invalid files data" });
+      }
+
+      const results = [];
+      for (const file of files) {
+        const { content, filename } = file;
+        const { data: frontmatter, content: mdxContent } = matter(content);
+        
+        // Create post from MDX
+        const postData = {
+          title: frontmatter.title || filename.replace('.mdx', ''),
+          content: mdxContent,
+          slug: frontmatter.slug || filename.replace('.mdx', '').toLowerCase(),
+          excerpt: frontmatter.excerpt || mdxContent.slice(0, 160) + '...',
+          categoryId: frontmatter.categoryId || 1,
+          published: true,
+          authorId: 1,
+          thumbnail: frontmatter.thumbnail || '',
+          tags: frontmatter.tags || []
+        };
+
+        const post = await storage.createPost(postData);
+        results.push(post);
+      }
+
+      res.status(201).json(results);
+    } catch (error) {
+      console.error("Error uploading MDX files:", error);
+      res.status(500).json({ message: "Failed to upload MDX files" });
     }
   });
 
