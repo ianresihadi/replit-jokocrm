@@ -315,8 +315,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           let post;
           if (existingPost) {
-            // Update existing post while preserving its ID
-            post = await storage.updatePost(existingPost.id, postData);
+            // Update existing post while preserving its ID and other fields
+            post = await storage.updatePost(existingPost.id, {
+              ...existingPost,
+              ...postData,
+              views: existingPost.views,
+              createdAt: existingPost.createdAt
+            });
             console.log(`Updated existing post: ${post.title}`);
           } else {
             // Create new post
