@@ -29,8 +29,8 @@ function App() {
             <Header />
             <Switch>
               <Route path="/" component={Home} />
-              <Route path="/blog" component={BlogList} /> 
-              <Route path="/blog/:slug" component={BlogPost} /> 
+              <Route path="/blog" component={Blog} />
+              <Route path="/blog/:slug" component={BlogPost} />
               <Route path="/about" component={About} />
               <Route path="/contact" component={Contact} />
               <Route path="/services" component={Services} />
