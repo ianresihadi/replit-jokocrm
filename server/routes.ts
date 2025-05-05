@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { z } from "zod";
 import multer from "multer";
 import path from "path";
+import matter from "gray-matter";
 import { insertSubscriberSchema, insertContactMessageSchema, insertPostSchema } from "@shared/schema";
 import { authenticate, ADMIN_USERNAME, ADMIN_PASSWORD, JWT_SECRET } from "./auth";
 

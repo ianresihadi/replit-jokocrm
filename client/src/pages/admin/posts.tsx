@@ -492,10 +492,18 @@ export default function AdminPosts() {
                     <p className="text-sm text-slate-500 mb-2">
                       {selectedFiles.length} file(s) selected
                     </p>
-                    <Button 
-                      onClick={async () => {
-                        setUploading(true);
-                        try {
+                    {uploading ? (
+                      <div className="space-y-2">
+                        <div className="h-1 w-full bg-slate-200 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary animate-pulse" style={{width: '100%'}}></div>
+                        </div>
+                        <p className="text-sm text-slate-500 text-center">Uploading files...</p>
+                      </div>
+                    ) : (
+                      <Button 
+                        onClick={async () => {
+                          setUploading(true);
+                          try {
                           const fileContents = await Promise.all(
                             selectedFiles.map(async (file) => ({
                               filename: file.name,
@@ -534,8 +542,9 @@ export default function AdminPosts() {
                       }}
                       disabled={uploading}
                     >
-                      {uploading ? 'Uploading...' : 'Upload Files'}
+                      Upload Files
                     </Button>
+                    )}
                   </div>
                 )}
                 <p className="text-sm text-slate-500">
