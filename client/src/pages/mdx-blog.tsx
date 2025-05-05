@@ -7,7 +7,7 @@ import { Calendar } from "lucide-react";
 import { getMDXFiles, type Post } from "@/lib/mdx";
 import { formatDate } from "@/lib/utils";
 
-const BlogList = () => {
+const MDXBlogList = () => {
   const { data: posts = [], isLoading } = useQuery<Post[]>({
     queryKey: ['mdx-posts'],
     queryFn: getMDXFiles
@@ -46,7 +46,7 @@ const BlogList = () => {
               
               <div className="flex items-center text-sm text-slate-500 dark:text-slate-400">
                 <Calendar className="w-4 h-4 mr-2" />
-                {formatDate(post.frontmatter.date)}
+                {post.frontmatter.date}
               </div>
             </motion.article>
           ))}
@@ -56,4 +56,4 @@ const BlogList = () => {
   );
 };
 
-export default BlogList;
+export default MDXBlogList;

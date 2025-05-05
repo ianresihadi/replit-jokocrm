@@ -22,18 +22,28 @@ export interface Post {
 // Function to get all MDX files
 export const getMDXFiles = async (): Promise<Post[]> => {
   try {
-    const contentDir = path.join(process.cwd(), 'client/src/content/posts');
+    const contentDir = 'client/src/content/posts';
     const files = await fs.readdir(contentDir);
+    console.log('Found MDX files:', files);
     
     const posts = await Promise.all(
       files
         .filter(file => file.endsWith('.mdx'))
         .map(async (file) => {
-          const content = await fs.readFile(path.join(contentDir, file), 'utf-8');
+          const content = await fs.readFile(`${contentDir}/${file}`, 'utf-8');
           const { data: frontmatter, content: code } = matter(content);
           
+          // Ensure required frontmatter fields
+          const defaultFrontmatter = {
+            title: file.replace('.mdx', ''),
+            slug: file.replace('.mdx', ''),
+            date: new Date().toISOString(),
+            excerpt: '',
+            author: 'Anonymous'
+          };
+
           return {
-            frontmatter: frontmatter as PostFrontmatter,
+            frontmatter: { ...defaultFrontmatter, ...frontmatter } as PostFrontmatter,
             code
           };
         })

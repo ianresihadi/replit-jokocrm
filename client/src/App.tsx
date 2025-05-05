@@ -9,8 +9,8 @@ import Footer from "@/components/layout/footer";
 import ScrollToTop from "@/components/layout/scroll-to-top";
 
 import Home from "@/pages/home";
-import BlogList from "./pages/mdx-blog"; // Added
-import BlogPost from "./pages/mdx-post"; // Added
+import BlogList from "./pages/mdx-blog"; 
+import BlogPost from "./pages/mdx-post"; 
 import About from "@/pages/about";
 import Contact from "@/pages/contact";
 import Services from "@/pages/services";
@@ -29,8 +29,8 @@ function App() {
             <Header />
             <Switch>
               <Route path="/" component={Home} />
-              <Route path="/blog" component={BlogList} /> {/* Replaced Blog with BlogList */}
-              <Route path="/blog/:slug" component={BlogPost} /> {/* Added BlogPost route */}
+              <Route path="/blog" component={BlogList} /> 
+              <Route path="/blog/:slug" component={BlogPost} /> 
               <Route path="/about" component={About} />
               <Route path="/contact" component={Contact} />
               <Route path="/services" component={Services} />
