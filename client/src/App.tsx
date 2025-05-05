@@ -9,8 +9,8 @@ import Footer from "@/components/layout/footer";
 import ScrollToTop from "@/components/layout/scroll-to-top";
 
 import Home from "@/pages/home";
-import BlogList from "./pages/mdx-blog"; 
-import BlogPost from "./pages/mdx-post"; 
+import BlogList from "./pages/blog"; 
+import BlogPost from "./pages/post"; 
 import About from "@/pages/about";
 import Contact from "@/pages/contact";
 import Services from "@/pages/services";

@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Helmet } from "react-helmet";
