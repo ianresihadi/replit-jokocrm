@@ -3,11 +3,14 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
 import multer from 'multer';
+import cors from 'cors';
 
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use('/uploads', express.static('uploads'));
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
