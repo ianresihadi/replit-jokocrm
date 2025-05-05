@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet";
 import { motion } from "framer-motion";
 import { Calendar } from "lucide-react";
 import { getMDXFiles, type Post } from "@/lib/mdx";
+import { formatDate } from "@/lib/utils";
 
 const Blog = () => {
   const { data: posts = [], isLoading } = useQuery<Post[]>({
@@ -34,9 +35,9 @@ const Blog = () => {
               className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm"
             >
               <Link href={`/blog/${post.frontmatter.slug}`}>
-                <a className="block hover:text-primary transition-colors">
-                  <h2 className="text-2xl font-bold mb-2">{post.frontmatter.title}</h2>
-                </a>
+                <h2 className="text-2xl font-bold mb-2 hover:text-primary transition-colors">
+                  {post.frontmatter.title}
+                </h2>
               </Link>
 
               <p className="text-slate-600 dark:text-slate-300 mb-4">
@@ -45,7 +46,7 @@ const Blog = () => {
 
               <div className="flex items-center text-sm text-slate-500 dark:text-slate-400">
                 <Calendar className="w-4 h-4 mr-2" />
-                {post.frontmatter.date}
+                {formatDate(post.frontmatter.date)}
               </div>
             </motion.article>
           ))}
