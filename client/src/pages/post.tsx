@@ -22,21 +22,24 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { formatDate, getCategoryClassName, cn } from "@/lib/utils";
 import { PostWithAuthor } from "@shared/schema";
+// Added import for MDX components (assuming necessary)
+import { MDXRenderer } from 'next-mdx-remote/rsc'; // Or your preferred MDX renderer
+
+
 
 const PostPage = () => {
   const [match, params] = useRoute("/blog/:slug");
   const slug = params?.slug || "";
-  
-  const { data: post, isLoading, isError } = useQuery<PostWithAuthor>({
-    queryKey: ['/api/posts/slug', slug],
+
+  const { data: post, isLoading, isError } = useQuery({
+    queryKey: ['mdx-post', slug],
     queryFn: async () => {
-      const res = await fetch(`/api/posts/slug/${slug}`);
-      if (!res.ok) throw new Error("Failed to fetch post");
-      return await res.json();
+      const posts = await getMDXFiles(); // Requires implementation of getMDXFiles
+      return posts.find(p => p.frontmatter.slug === slug);
     },
     enabled: !!slug
   });
-  
+
   const { data: relatedPosts = [] } = useQuery<PostWithAuthor[]>({
     queryKey: ['/api/posts/related', post?.category.id, post?.id],
     queryFn: async () => {
@@ -46,12 +49,11 @@ const PostPage = () => {
     },
     enabled: !!post?.id
   });
-  
-  // Share functionality
+
   const sharePost = (platform: string) => {
     const url = window.location.href;
     const title = post?.title || 'Jokoris Blog Post';
-    
+
     switch (platform) {
       case 'facebook':
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
@@ -63,17 +65,14 @@ const PostPage = () => {
         window.open(`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`, '_blank');
         break;
       default:
-        // Direct copy to clipboard
         navigator.clipboard.writeText(url).then(() => {
           alert('Link copied to clipboard!');
         });
     }
   };
-  
-  // Gunakan hook useViewTracker untuk melacak artikel yang dibaca
+
   useViewTracker(post?.id || null);
-  
-  // Load Disqus comments
+
   useEffect(() => {
     if (post && window.DISQUS) {
       window.DISQUS.reset({
@@ -85,7 +84,6 @@ const PostPage = () => {
         }
       });
     } else if (post) {
-      // Add Disqus script if not already loaded
       const script = document.createElement('script');
       script.src = 'https://jokoris.disqus.com/embed.js';
       script.setAttribute('data-timestamp', Date.now().toString());
@@ -114,7 +112,7 @@ const PostPage = () => {
       </div>
     );
   }
-  
+
   if (isError || !post) {
     return (
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 text-center">
@@ -152,10 +150,9 @@ const PostPage = () => {
         <meta property="article:author" content={post.author.name} />
         <meta property="article:section" content={post.category.name} />
       </Helmet>
-      
+
       <main className="pt-8 pb-16">
         <article className="max-w-3xl mx-auto px-4 sm:px-6">
-          {/* Back button */}
           <div className="mb-8">
             <Link href="/blog">
               <a className="inline-flex items-center text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-foreground transition-colors duration-150">
@@ -164,8 +161,7 @@ const PostPage = () => {
               </a>
             </Link>
           </div>
-          
-          {/* Header */}
+
           <header className="mb-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -190,11 +186,11 @@ const PostPage = () => {
                   <span>{formatDate(post.createdAt)}</span>
                 </div>
               </div>
-              
+
               <h1 className="text-3xl md:text-4xl font-bold font-poppins text-slate-900 dark:text-white mb-6">
                 {post.title}
               </h1>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <img 
@@ -211,7 +207,7 @@ const PostPage = () => {
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
                   <Button 
                     size="sm" 
@@ -249,8 +245,7 @@ const PostPage = () => {
               </div>
             </motion.div>
           </header>
-          
-          {/* Featured Image */}
+
           <motion.figure 
             className="mb-8 rounded-xl overflow-hidden shadow-md"
             initial={{ opacity: 0, y: 20 }}
@@ -263,17 +258,18 @@ const PostPage = () => {
               className="w-full h-auto aspect-[16/9] object-cover"
             />
           </motion.figure>
-          
-          {/* Content */}
+
           <motion.div 
             className="prose prose-slate dark:prose-invert lg:prose-lg max-w-none mb-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
-          
-          {/* Tags */}
+          >
+            {/* Render MDX content here */}
+            {post && <MDXRenderer>{post.content}</MDXRenderer>} {/* Requires content to be in MDX format */}
+          </motion.div>
+
+
           {post.tags && post.tags.length > 0 && (
             <div className="mb-12">
               <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-3">
@@ -290,8 +286,7 @@ const PostPage = () => {
               </div>
             </div>
           )}
-          
-          {/* Author Section */}
+
           <div className="mb-12">
             <Card>
               <CardContent className="pt-6">
@@ -345,8 +340,7 @@ const PostPage = () => {
               </CardContent>
             </Card>
           </div>
-          
-          {/* Comments Section */}
+
           <div className="mb-12">
             <div className="flex items-center gap-2 mb-6">
               <MessageSquare className="h-5 w-5" />
@@ -356,8 +350,7 @@ const PostPage = () => {
             </div>
             <div id="disqus_thread"></div>
           </div>
-          
-          {/* Related Posts */}
+
           {relatedPosts.length > 0 && (
             <div className="mb-12">
               <Separator className="mb-8" />
