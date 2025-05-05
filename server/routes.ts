@@ -284,16 +284,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid files data" });
       }
 
+      // Get existing posts first
+      const { posts: existingPosts } = await storage.getPosts();
+      
       const results = [];
       for (const file of files) {
         const { content, filename } = file;
         const { data: frontmatter, content: mdxContent } = matter(content);
         
+        // Check if post with same slug already exists
+        const slug = frontmatter.slug || filename.replace('.mdx', '').toLowerCase();
+        const existingPost = existingPosts.find(p => p.slug === slug);
+        
         // Create post from MDX
         const postData = {
           title: frontmatter.title || filename.replace('.mdx', ''),
           content: mdxContent,
-          slug: frontmatter.slug || filename.replace('.mdx', '').toLowerCase(),
+          slug: slug,
           excerpt: frontmatter.excerpt || mdxContent.slice(0, 160) + '...',
           categoryId: frontmatter.categoryId || 1,
           published: true,
@@ -302,7 +309,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           tags: frontmatter.tags || []
         };
 
-        const post = await storage.createPost(postData);
+        let post;
+        if (existingPost) {
+          // Update existing post
+          post = await storage.updatePost(existingPost.id, postData);
+        } else {
+          // Create new post
+          post = await storage.createPost(postData);
+        }
         results.push(post);
       }
 
