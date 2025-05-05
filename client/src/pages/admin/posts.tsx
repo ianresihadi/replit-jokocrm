@@ -530,7 +530,13 @@ export default function AdminPosts() {
                           }
 
                           const newPosts = await res.json();
-                          setPosts(prev => [...prev, ...newPosts]);
+                          // Update posts while preserving existing ones by id
+                          setPosts(prev => {
+                            const existingPosts = prev.filter(p => 
+                              !newPosts.find(np => np.id === p.id)
+                            );
+                            return [...existingPosts, ...newPosts];
+                          });
                           setSelectedFiles([]);
                           alert(`Successfully uploaded ${fileContents.length} posts`);
                         } catch (err: any) {

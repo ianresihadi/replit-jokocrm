@@ -293,8 +293,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { content, filename } = file;
         const { data: frontmatter, content: mdxContent } = matter(content);
         
-        // Check if post with same slug already exists
+        // Generate slug from filename if not provided
         const slug = frontmatter.slug || filename.replace('.mdx', '').toLowerCase();
+        
+        // Check if post with same slug already exists
         const existingPost = existingPosts.find(p => p.slug === slug);
         
         // Create post from MDX
@@ -310,15 +312,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           tags: frontmatter.tags || []
         };
 
-        let post;
-        if (existingPost) {
-          // Update existing post
-          post = await storage.updatePost(existingPost.id, postData);
-        } else {
-          // Create new post
-          post = await storage.createPost(postData);
+        try {
+          let post;
+          if (existingPost) {
+            // Update existing post while preserving its ID
+            post = await storage.updatePost(existingPost.id, postData);
+            console.log(`Updated existing post: ${post.title}`);
+          } else {
+            // Create new post
+            post = await storage.createPost(postData);
+            console.log(`Created new post: ${post.title}`);
+          }
+          results.push(post);
+        } catch (error) {
+          console.error(`Error processing file ${filename}:`, error);
         }
-        results.push(post);
       }
 
       res.status(201).json(results);
