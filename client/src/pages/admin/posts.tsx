@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -166,7 +165,7 @@ export default function AdminPosts() {
 
       const newPost = await res.json();
       setPosts([...posts, newPost]);
-      
+
       // Reset form
       setTitle('');
       setCategory('');
@@ -191,6 +190,7 @@ export default function AdminPosts() {
               <TabsTrigger value="editor">
                 {editingPost ? 'Edit Post' : 'Buat Post Baru'}
               </TabsTrigger>
+              <TabsTrigger value="batch">Upload MDX</TabsTrigger>
             </TabsList>
             <Button onClick={handleNewPost} className="bg-primary">
               <Plus className="h-4 w-4 mr-2" /> Tambah Post Baru
@@ -416,7 +416,7 @@ export default function AdminPosts() {
                         if (file) {
                           const formData = new FormData();
                           formData.append('image', file);
-                          
+
                           fetch('/api/upload', {
                             method: 'POST',
                             headers: {
@@ -467,6 +467,10 @@ export default function AdminPosts() {
                 </div>
               </form>
             </div>
+          </TabsContent>
+          <TabsContent value="batch">
+            {/*  Add MDX batch upload functionality here */}
+            <p>MDX batch upload functionality not yet implemented.</p>
           </TabsContent>
         </Tabs>
       </div>
