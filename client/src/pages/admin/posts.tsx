@@ -484,6 +484,10 @@ export default function AdminPosts() {
                   );
 
                   try {
+                    if (!localStorage.getItem('adminToken')) {
+                      throw new Error('Not authenticated');
+                    }
+
                     const res = await fetch('/api/upload/mdx', {
                       method: 'POST',
                       headers: {
@@ -493,13 +497,17 @@ export default function AdminPosts() {
                       body: JSON.stringify({ files: fileContents })
                     });
 
-                    if (!res.ok) throw new Error('Upload failed');
+                    if (!res.ok) {
+                      const error = await res.json();
+                      throw new Error(error.message || 'Upload failed');
+                    }
 
                     const newPosts = await res.json();
-                    setPosts([...posts, ...newPosts]);
+                    setPosts(prev => [...prev, ...newPosts]);
                     alert(`Successfully uploaded ${files.length} posts`);
-                  } catch (err) {
-                    setError('Failed to upload MDX files. Please try again.');
+                  } catch (err: any) {
+                    console.error('Upload error:', err);
+                    setError(err.message || 'Failed to upload MDX files. Please try again.');
                   }
                 }}
                 className="block w-full text-sm text-slate-500
