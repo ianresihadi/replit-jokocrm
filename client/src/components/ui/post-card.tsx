@@ -16,7 +16,7 @@ const PostCard = ({ post }: PostCardProps) => {
     >
       <div className="relative overflow-hidden">
         <img 
-          src={post.thumbnail?.startsWith('http') ? post.thumbnail : (post.thumbnail ? `/${post.thumbnail}` : 'https://placehold.co/600x400/e9ecef/6c757d?text=No+Image')} 
+          src={post.thumbnail ? (post.thumbnail.startsWith('http') ? post.thumbnail : post.thumbnail.startsWith('/') ? post.thumbnail : `/${post.thumbnail}`) : 'https://placehold.co/600x400/e9ecef/6c757d?text=No+Image'} 
           alt={post.title} 
           className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
         />
